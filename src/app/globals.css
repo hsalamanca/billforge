@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #12171c;
+  --ink-soft: #2a323c;
+  --muted: #5c6570;
+  --line: #d5dbe3;
+  --paper: #eef1f4;
+  --paper-deep: #e2e7ed;
+  --brass: #b8923a;
+  --brass-deep: #8f6f28;
+  --brass-glow: #d4b56a;
+  --sea: #2a5f6e;
+  --sea-soft: #3d7a8c;
+  --success: #2f6f4e;
+  --danger: #9b3b3b;
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --radius: 2px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-brass: var(--brass);
+  --color-brass-deep: var(--brass-deep);
+  --color-brass-glow: var(--brass-glow);
+  --color-sea: var(--sea);
+  --color-sea-soft: var(--sea-soft);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(184, 146, 58, 0.16), transparent 55%),
+    radial-gradient(900px 500px at 90% 0%, rgba(42, 95, 110, 0.14), transparent 50%),
+    linear-gradient(180deg, #f5f7fa 0%, var(--paper) 40%, #e8edf2 100%);
+  font-family: var(--font-body), "Segoe UI", sans-serif;
+}
+
+::selection {
+  background: rgba(184, 146, 58, 0.28);
+  color: var(--ink);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.grain {
+  position: relative;
+  isolation: isolate;
+}
+
+.grain::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.045;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index: 1;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes draw-line {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(184, 146, 58, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(184, 146, 58, 0);
+  }
+}
+
+.animate-rise {
+  animation: rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-rise-delay-1 {
+  animation: rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+.animate-rise-delay-2 {
+  animation: rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
+}
+
+.animate-rise-delay-3 {
+  animation: rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.36s both;
+}
+
+.draw-underline {
+  transform-origin: left;
+  animation: draw-line 1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+}
+
+.cta-pulse {
+  animation: pulse-glow 2.8s ease-in-out infinite;
+}
+
+.field {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ink);
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius);
+  font: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field:focus {
+  outline: none;
+  border-color: var(--brass);
+  box-shadow: 0 0 0 3px rgba(184, 146, 58, 0.18);
+}
+
+.label {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.hero-plane {
+  background:
+    linear-gradient(115deg, rgba(18, 23, 28, 0.92) 0%, rgba(18, 23, 28, 0.72) 45%, rgba(42, 95, 110, 0.45) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='900' viewBox='0 0 1600 900'%3E%3Crect fill='%2312171c' width='1600' height='900'/%3E%3Cg fill='none' stroke='%23b8923a' stroke-opacity='0.18'%3E%3Cpath d='M0 720h1600M0 180h1600M220 0v900M980 0v900'/%3E%3C/g%3E%3Cpath fill='%232a5f6e' fill-opacity='0.35' d='M900 0l700 0 0 900-420-900z'/%3E%3Ccircle cx='1180' cy='220' r='180' fill='%23b8923a' fill-opacity='0.12'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: center;
+}
