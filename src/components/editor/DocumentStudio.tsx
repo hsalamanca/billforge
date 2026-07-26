@@ -5,7 +5,7 @@ import Link from "next/link";
 import { nanoid } from "nanoid";
 import { Button } from "@/components/ui/Button";
 import { ClearableNumberInput } from "@/components/ui/ClearableNumberInput";
-import { documentTotals, formatMoney } from "@/lib/currency";
+import { documentTotals, formatMoney, formatMoneyOrDash, lineTotal } from "@/lib/currency";
 import { downloadDocumentPdf } from "@/lib/pdf";
 import { emitStudioChange, useStudioSnapshot } from "@/lib/store";
 import {
@@ -71,7 +71,7 @@ export function DocumentStudio() {
   function addItem() {
     if (!active) return;
     updateActive({
-      items: [...active.items, { id: nanoid(6), description: "", quantity: 0, rate: 0 }],
+      items: [...active.items, { id: nanoid(6), description: "", quantity: null, rate: null }],
     });
   }
 
@@ -348,8 +348,9 @@ export function DocumentStudio() {
                 <label>
                   <span className="label">Tax %</span>
                   <ClearableNumberInput
+                    inputKey={`${active.id}-tax`}
                     aria-label="Tax percent"
-                    placeholder="0"
+                    placeholder="Optional"
                     value={active.taxRate}
                     onValueChange={(taxRate) => updateActive({ taxRate })}
                   />
@@ -379,7 +380,8 @@ export function DocumentStudio() {
                 </div>
                 <div className="divide-y divide-line">
                   {active.items.map((item) => {
-                    const itemTotal = item.quantity * item.rate;
+                    const itemTotal = lineTotal(item.quantity, item.rate);
+                    const hasAmounts = item.quantity != null || item.rate != null;
                     return (
                       <div
                         key={item.id}
@@ -399,6 +401,7 @@ export function DocumentStudio() {
                         <label>
                           <span className="label md:sr-only">Quantity</span>
                           <ClearableNumberInput
+                            inputKey={`${active.id}-${item.id}-qty`}
                             aria-label="Quantity"
                             placeholder="Qty"
                             value={item.quantity}
@@ -412,6 +415,7 @@ export function DocumentStudio() {
                               $
                             </span>
                             <ClearableNumberInput
+                              inputKey={`${active.id}-${item.id}-price`}
                               aria-label="Unit price"
                               className="pl-7"
                               placeholder="Price"
@@ -420,9 +424,9 @@ export function DocumentStudio() {
                             />
                           </div>
                         </label>
-                        <p className="field flex items-center justify-between border-dashed bg-paper/80 font-mono text-sm md:justify-end">
-                          <span className="text-muted md:hidden">Line total</span>
-                          {formatMoney(itemTotal, active.currency)}
+                        <p className="field flex items-center justify-between border-dashed bg-paper/80 font-mono text-sm text-muted md:justify-end">
+                          <span className="md:hidden">Line total</span>
+                          {hasAmounts ? formatMoneyOrDash(itemTotal, active.currency) : "—"}
                         </p>
                         <Button
                           variant="ghost"
@@ -468,13 +472,13 @@ export function DocumentStudio() {
                         {item.description || "Add a description"}
                       </span>
                       <span className="shrink-0 font-mono">
-                        {formatMoney(item.quantity * item.rate, active.currency)}
+                        {formatMoneyOrDash(lineTotal(item.quantity, item.rate), active.currency)}
                       </span>
                     </div>
                     <p className="font-mono text-xs text-paper/50">
-                      {item.quantity || item.rate
-                        ? `Qty ${item.quantity || "—"} × ${
-                            item.rate ? formatMoney(item.rate, active.currency) : "—"
+                      {item.quantity != null || item.rate != null
+                        ? `Qty ${item.quantity ?? "—"} × ${
+                            item.rate != null ? formatMoney(item.rate, active.currency) : "—"
                           }`
                         : "Enter quantity and price"}
                     </p>
@@ -485,9 +489,9 @@ export function DocumentStudio() {
                 <div className="mt-6 space-y-2 border-t border-paper/15 pt-5 text-sm">
                   <div className="flex justify-between text-paper/70">
                     <span>Subtotal</span>
-                    <span>{formatMoney(totals.subtotal, active.currency)}</span>
+                    <span>{formatMoneyOrDash(totals.subtotal, active.currency)}</span>
                   </div>
-                  {active.taxRate > 0 ? (
+                  {active.taxRate != null && active.taxRate > 0 ? (
                     <div className="flex justify-between text-paper/70">
                       <span>Tax</span>
                       <span>{formatMoney(totals.tax, active.currency)}</span>
@@ -496,7 +500,7 @@ export function DocumentStudio() {
                   <div className="flex justify-between text-lg font-semibold">
                     <span>Total</span>
                     <span className="text-brass-glow">
-                      {formatMoney(totals.total, active.currency)}
+                      {formatMoneyOrDash(totals.total, active.currency)}
                     </span>
                   </div>
                 </div>

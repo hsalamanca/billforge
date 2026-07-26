@@ -72,10 +72,28 @@ export function canCreateDocument(): { ok: boolean; remaining: number; isPro: bo
   return { ok: remaining > 0, remaining, isPro: false };
 }
 
+function emptyToNull(value: number | null | undefined): number | null {
+  if (value == null || value === 0) return null;
+  return value;
+}
+
+/** Normalize legacy docs that stored 0 instead of blank. */
+function normalizeDocument(doc: BillDocument): BillDocument {
+  return {
+    ...doc,
+    taxRate: emptyToNull(doc.taxRate),
+    items: (doc.items ?? []).map((item) => ({
+      ...item,
+      quantity: emptyToNull(item.quantity),
+      rate: emptyToNull(item.rate),
+    })),
+  };
+}
+
 export function listDocuments(): BillDocument[] {
-  return readJson<BillDocument[]>(DOCS_KEY, []).sort(
-    (a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt),
-  );
+  return readJson<BillDocument[]>(DOCS_KEY, [])
+    .map(normalizeDocument)
+    .sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt));
 }
 
 export function getDocument(id: string): BillDocument | undefined {
@@ -127,15 +145,15 @@ export function createBlankDocument(type: DocumentType = "invoice"): BillDocumen
       {
         id: nanoid(6),
         description: "",
-        quantity: 0,
-        rate: 0,
+        quantity: null,
+        rate: null,
       },
     ],
     notes:
       type === "quote"
         ? "This quote is valid for 30 days. 50% deposit to begin."
         : "Payment due within 14 days. Thank you for your business.",
-    taxRate: 0,
+    taxRate: null,
     currency: "USD",
     createdAt: now.toISOString(),
     updatedAt: now.toISOString(),

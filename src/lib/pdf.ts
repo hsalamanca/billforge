@@ -2,7 +2,7 @@
 
 import { jsPDF } from "jspdf";
 import type { BillDocument } from "./types";
-import { documentTotals, formatMoney, lineTotal } from "./currency";
+import { asAmount, documentTotals, formatMoney, lineTotal } from "./currency";
 
 export function downloadDocumentPdf(doc: BillDocument, opts: { watermark: boolean }) {
   const pdf = new jsPDF({ unit: "pt", format: "letter" });
@@ -103,10 +103,13 @@ export function downloadDocumentPdf(doc: BillDocument, opts: { watermark: boolea
       pdf.rect(margin, y - 11, pageW - margin * 2, 22, "F");
     }
     const desc = item.description || "—";
+    const qty = item.quantity == null ? "—" : String(item.quantity);
+    const price = item.rate == null ? "—" : formatMoney(item.rate, doc.currency);
+    const amount = lineTotal(item.quantity, item.rate);
     pdf.text(desc.slice(0, 60), cols.desc + 8, y);
-    pdf.text(String(item.quantity), cols.qty, y, { align: "right" });
-    pdf.text(formatMoney(item.rate, doc.currency), cols.rate, y, { align: "right" });
-    pdf.text(formatMoney(lineTotal(item.quantity, item.rate), doc.currency), cols.amount, y, {
+    pdf.text(qty, cols.qty, y, { align: "right" });
+    pdf.text(price, cols.rate, y, { align: "right" });
+    pdf.text(amount ? formatMoney(amount, doc.currency) : "—", cols.amount, y, {
       align: "right",
     });
     y += 22;
@@ -127,9 +130,11 @@ export function downloadDocumentPdf(doc: BillDocument, opts: { watermark: boolea
     y += bold ? 20 : 16;
   };
 
-  row("Subtotal", formatMoney(subtotal, doc.currency));
-  if (doc.taxRate > 0) row(`Tax (${doc.taxRate}%)`, formatMoney(tax, doc.currency));
-  row("Total", formatMoney(total, doc.currency), true);
+  row("Subtotal", subtotal ? formatMoney(subtotal, doc.currency) : "—");
+  if (asAmount(doc.taxRate) > 0) {
+    row(`Tax (${doc.taxRate}%)`, formatMoney(tax, doc.currency));
+  }
+  row("Total", total ? formatMoney(total, doc.currency) : "—", true);
 
   if (doc.notes) {
     y += 16;

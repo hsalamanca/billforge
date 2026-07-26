@@ -5,8 +5,10 @@ export type DocumentStatus = "draft" | "sent" | "paid" | "accepted" | "void";
 export interface LineItem {
   id: string;
   description: string;
-  quantity: number;
-  rate: number;
+  /** null = blank field (do not show 0) */
+  quantity: number | null;
+  /** null = blank field (do not show 0) */
+  rate: number | null;
 }
 
 export interface Party {
@@ -27,7 +29,8 @@ export interface BillDocument {
   to: Party;
   items: LineItem[];
   notes: string;
-  taxRate: number;
+  /** null = blank tax field */
+  taxRate: number | null;
   currency: string;
   logoDataUrl?: string;
   createdAt: string;
