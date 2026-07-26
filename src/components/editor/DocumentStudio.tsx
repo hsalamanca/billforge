@@ -374,7 +374,7 @@ export function DocumentStudio() {
                 <div className="hidden border-b border-line px-4 py-2 md:grid md:grid-cols-[minmax(0,1.6fr)_100px_130px_120px_auto] md:gap-2">
                   <p className="label mb-0">Description</p>
                   <p className="label mb-0">Quantity</p>
-                  <p className="label mb-0">Unit price</p>
+                  <p className="label mb-0">Unit price ($)</p>
                   <p className="label mb-0 text-right">Line total</p>
                   <span />
                 </div>
@@ -410,19 +410,13 @@ export function DocumentStudio() {
                         </label>
                         <label>
                           <span className="label md:sr-only">Unit price</span>
-                          <div className="relative">
-                            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
-                              $
-                            </span>
-                            <ClearableNumberInput
-                              inputKey={`${active.id}-${item.id}-price`}
-                              aria-label="Unit price"
-                              className="pl-7"
-                              placeholder="Price"
-                              value={item.rate}
-                              onValueChange={(rate) => updateItem(item.id, { rate })}
-                            />
-                          </div>
+                          <ClearableNumberInput
+                            inputKey={`${active.id}-${item.id}-price`}
+                            aria-label="Unit price"
+                            placeholder="e.g. 150"
+                            value={item.rate}
+                            onValueChange={(rate) => updateItem(item.id, { rate })}
+                          />
                         </label>
                         <p className="field flex items-center justify-between border-dashed bg-paper/80 font-mono text-sm text-muted md:justify-end">
                           <span className="md:hidden">Line total</span>

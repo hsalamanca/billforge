@@ -77,16 +77,27 @@ function emptyToNull(value: number | null | undefined): number | null {
   return value;
 }
 
-/** Normalize legacy docs that stored 0 instead of blank. */
+/** Normalize legacy docs that stored 0 / leftover defaults instead of blank. */
 function normalizeDocument(doc: BillDocument): BillDocument {
   return {
     ...doc,
     taxRate: emptyToNull(doc.taxRate),
-    items: (doc.items ?? []).map((item) => ({
-      ...item,
-      quantity: emptyToNull(item.quantity),
-      rate: emptyToNull(item.rate),
-    })),
+    items: (doc.items ?? []).map((item) => {
+      const rate = emptyToNull(item.rate);
+      const quantity = emptyToNull(item.quantity);
+      const description = (item.description ?? "").trim();
+      // Clear leftover starter "1" on unfinished lines from older builds
+      const isBlankStarter =
+        !description &&
+        rate == null &&
+        (quantity == null || quantity === 1);
+      return {
+        ...item,
+        description,
+        quantity: isBlankStarter ? null : quantity,
+        rate,
+      };
+    }),
   };
 }
 
