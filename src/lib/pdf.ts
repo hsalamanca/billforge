@@ -73,8 +73,8 @@ export function downloadDocumentPdf(doc: BillDocument, opts: { watermark: boolea
   y += 22;
   const cols = {
     desc: margin,
-    qty: pageW - margin - 180,
-    rate: pageW - margin - 110,
+    qty: pageW - margin - 210,
+    rate: pageW - margin - 120,
     amount: pageW - margin,
   };
 
@@ -85,8 +85,8 @@ export function downloadDocumentPdf(doc: BillDocument, opts: { watermark: boolea
   pdf.setTextColor("#F3F5F7");
   pdf.text("DESCRIPTION", cols.desc + 8, y);
   pdf.text("QTY", cols.qty, y, { align: "right" });
-  pdf.text("RATE", cols.rate, y, { align: "right" });
-  pdf.text("AMOUNT", cols.amount, y, { align: "right" });
+  pdf.text("UNIT PRICE", cols.rate, y, { align: "right" });
+  pdf.text("LINE TOTAL", cols.amount, y, { align: "right" });
   y += 24;
 
   pdf.setFont("helvetica", "normal");

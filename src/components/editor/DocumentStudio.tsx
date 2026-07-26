@@ -359,52 +359,93 @@ export function DocumentStudio() {
 
               <div className="border border-line bg-white/55">
                 <div className="flex items-center justify-between border-b border-line px-4 py-3">
-                  <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">
-                    Line items
-                  </h2>
+                  <div>
+                    <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">
+                      Line items
+                    </h2>
+                    <p className="mt-1 text-xs text-muted">
+                      Each line needs a description, quantity, and unit price.
+                    </p>
+                  </div>
                   <Button variant="ghost" className="!py-1.5" onClick={addItem}>
                     Add line
                   </Button>
                 </div>
+                <div className="hidden border-b border-line px-4 py-2 md:grid md:grid-cols-[minmax(0,1.6fr)_100px_130px_120px_auto] md:gap-2">
+                  <p className="label mb-0">Description</p>
+                  <p className="label mb-0">Quantity</p>
+                  <p className="label mb-0">Unit price</p>
+                  <p className="label mb-0 text-right">Line total</p>
+                  <span />
+                </div>
                 <div className="divide-y divide-line">
-                  {active.items.map((item) => (
-                    <div
-                      key={item.id}
-                      className="grid gap-2 p-4 md:grid-cols-[1fr_90px_120px_auto]"
-                    >
-                      <input
-                        className="field"
-                        placeholder="Description"
-                        value={item.description}
-                        onChange={(e) => updateItem(item.id, { description: e.target.value })}
-                      />
-                      <input
-                        type="number"
-                        min={0}
-                        step={0.01}
-                        className="field"
-                        placeholder="Qty"
-                        value={item.quantity}
-                        onChange={(e) =>
-                          updateItem(item.id, { quantity: Number(e.target.value) || 0 })
-                        }
-                      />
-                      <input
-                        type="number"
-                        min={0}
-                        step={0.01}
-                        className="field"
-                        placeholder="Rate"
-                        value={item.rate}
-                        onChange={(e) =>
-                          updateItem(item.id, { rate: Number(e.target.value) || 0 })
-                        }
-                      />
-                      <Button variant="ghost" className="!py-2" onClick={() => removeItem(item.id)}>
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
+                  {active.items.map((item) => {
+                    const itemTotal = item.quantity * item.rate;
+                    return (
+                      <div
+                        key={item.id}
+                        className="grid gap-3 p-4 md:grid-cols-[minmax(0,1.6fr)_100px_130px_120px_auto] md:items-end md:gap-2"
+                      >
+                        <label className="min-w-0">
+                          <span className="label md:sr-only">Description</span>
+                          <input
+                            className="field"
+                            placeholder="e.g. Website redesign — homepage + 3 inner pages"
+                            value={item.description}
+                            onChange={(e) =>
+                              updateItem(item.id, { description: e.target.value })
+                            }
+                          />
+                        </label>
+                        <label>
+                          <span className="label md:sr-only">Quantity</span>
+                          <input
+                            type="number"
+                            min={0}
+                            step={0.01}
+                            className="field"
+                            placeholder="1"
+                            inputMode="decimal"
+                            value={item.quantity}
+                            onChange={(e) =>
+                              updateItem(item.id, { quantity: Number(e.target.value) || 0 })
+                            }
+                          />
+                        </label>
+                        <label>
+                          <span className="label md:sr-only">Unit price</span>
+                          <div className="relative">
+                            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+                              $
+                            </span>
+                            <input
+                              type="number"
+                              min={0}
+                              step={0.01}
+                              className="field pl-7"
+                              placeholder="0.00"
+                              inputMode="decimal"
+                              value={item.rate}
+                              onChange={(e) =>
+                                updateItem(item.id, { rate: Number(e.target.value) || 0 })
+                              }
+                            />
+                          </div>
+                        </label>
+                        <p className="field flex items-center justify-between border-dashed bg-paper/80 font-mono text-sm md:justify-end">
+                          <span className="text-muted md:hidden">Line total</span>
+                          {formatMoney(itemTotal, active.currency)}
+                        </p>
+                        <Button
+                          variant="ghost"
+                          className="!py-2"
+                          onClick={() => removeItem(item.id)}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -431,13 +472,20 @@ export function DocumentStudio() {
                 <p className="mt-2 font-semibold">{active.to.name || "Client name"}</p>
                 <p className="text-sm text-paper/65">{active.to.email || "client@email.com"}</p>
               </div>
-              <ul className="mt-6 space-y-3 border-t border-paper/15 pt-5 text-sm">
+              <ul className="mt-6 space-y-4 border-t border-paper/15 pt-5 text-sm">
                 {active.items.map((item) => (
-                  <li key={item.id} className="flex justify-between gap-4">
-                    <span className="text-paper/80">{item.description || "Line item"}</span>
-                    <span className="font-mono">
-                      {formatMoney(item.quantity * item.rate, active.currency)}
-                    </span>
+                  <li key={item.id} className="space-y-1">
+                    <div className="flex justify-between gap-4">
+                      <span className="text-paper/90">
+                        {item.description || "Add a description"}
+                      </span>
+                      <span className="shrink-0 font-mono">
+                        {formatMoney(item.quantity * item.rate, active.currency)}
+                      </span>
+                    </div>
+                    <p className="font-mono text-xs text-paper/50">
+                      Qty {item.quantity || 0} × {formatMoney(item.rate || 0, active.currency)}
+                    </p>
                   </li>
                 ))}
               </ul>
