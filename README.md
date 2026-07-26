@@ -4,6 +4,16 @@
 
 Billforge is a freemium micro-SaaS: create branded invoices/quotes in under a minute, export PDFs, and collect payment via Stripe Checkout links. Free plan is watermarked (3 docs/month). Pro is $29/mo or $240/yr.
 
+## Live
+
+| | |
+| --- | --- |
+| Production | https://billforge-eta.vercel.app |
+| GitHub | https://github.com/hsalamanca/billforge |
+| Vercel project | https://vercel.com/huguinho/billforge |
+
+GitHub ↔ Vercel are connected: pushes to `main` auto-deploy to production.
+
 ## Quick start
 
 ```bash
