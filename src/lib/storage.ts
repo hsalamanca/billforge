@@ -126,11 +126,8 @@ export function createBlankDocument(type: DocumentType = "invoice"): BillDocumen
     items: [
       {
         id: nanoid(6),
-        description:
-          type === "quote"
-            ? "Project discovery & proposal — scope, timeline, deliverables"
-            : "Professional services — describe the work delivered",
-        quantity: 1,
+        description: "",
+        quantity: 0,
         rate: 0,
       },
     ],

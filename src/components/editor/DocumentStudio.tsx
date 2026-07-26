@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { nanoid } from "nanoid";
 import { Button } from "@/components/ui/Button";
+import { ClearableNumberInput } from "@/components/ui/ClearableNumberInput";
 import { documentTotals, formatMoney } from "@/lib/currency";
 import { downloadDocumentPdf } from "@/lib/pdf";
 import { emitStudioChange, useStudioSnapshot } from "@/lib/store";
@@ -70,7 +71,7 @@ export function DocumentStudio() {
   function addItem() {
     if (!active) return;
     updateActive({
-      items: [...active.items, { id: nanoid(6), description: "", quantity: 1, rate: 0 }],
+      items: [...active.items, { id: nanoid(6), description: "", quantity: 0, rate: 0 }],
     });
   }
 
@@ -346,13 +347,11 @@ export function DocumentStudio() {
                 </label>
                 <label>
                   <span className="label">Tax %</span>
-                  <input
-                    type="number"
-                    min={0}
-                    step={0.01}
-                    className="field"
+                  <ClearableNumberInput
+                    aria-label="Tax percent"
+                    placeholder="0"
                     value={active.taxRate}
-                    onChange={(e) => updateActive({ taxRate: Number(e.target.value) || 0 })}
+                    onValueChange={(taxRate) => updateActive({ taxRate })}
                   />
                 </label>
               </div>
@@ -399,17 +398,11 @@ export function DocumentStudio() {
                         </label>
                         <label>
                           <span className="label md:sr-only">Quantity</span>
-                          <input
-                            type="number"
-                            min={0}
-                            step={0.01}
-                            className="field"
-                            placeholder="1"
-                            inputMode="decimal"
+                          <ClearableNumberInput
+                            aria-label="Quantity"
+                            placeholder="Qty"
                             value={item.quantity}
-                            onChange={(e) =>
-                              updateItem(item.id, { quantity: Number(e.target.value) || 0 })
-                            }
+                            onValueChange={(quantity) => updateItem(item.id, { quantity })}
                           />
                         </label>
                         <label>
@@ -418,17 +411,12 @@ export function DocumentStudio() {
                             <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
                               $
                             </span>
-                            <input
-                              type="number"
-                              min={0}
-                              step={0.01}
-                              className="field pl-7"
-                              placeholder="0.00"
-                              inputMode="decimal"
+                            <ClearableNumberInput
+                              aria-label="Unit price"
+                              className="pl-7"
+                              placeholder="Price"
                               value={item.rate}
-                              onChange={(e) =>
-                                updateItem(item.id, { rate: Number(e.target.value) || 0 })
-                              }
+                              onValueChange={(rate) => updateItem(item.id, { rate })}
                             />
                           </div>
                         </label>
@@ -484,7 +472,11 @@ export function DocumentStudio() {
                       </span>
                     </div>
                     <p className="font-mono text-xs text-paper/50">
-                      Qty {item.quantity || 0} × {formatMoney(item.rate || 0, active.currency)}
+                      {item.quantity || item.rate
+                        ? `Qty ${item.quantity || "—"} × ${
+                            item.rate ? formatMoney(item.rate, active.currency) : "—"
+                          }`
+                        : "Enter quantity and price"}
                     </p>
                   </li>
                 ))}
